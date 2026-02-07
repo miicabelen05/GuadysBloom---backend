@@ -1,0 +1,13 @@
+[
+  {
+    "id": 1,
+    "title": "Crema corporal natural GuadysBloom",
+    "description": "Crema corporal de cosm�tica natural",
+    "code": "GB-CREM-001",
+    "price": 9800,
+    "status": true,
+    "stock": 15,
+    "category": "cosmetica natural",
+    "thumbnails": []
+  }
+]

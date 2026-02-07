@@ -1,0 +1,15 @@
+{
+  "name": "guadysbloom-backend",
+  "version": "1.0.0",
+  "description": "API backend para el proyecto GuadysBloom",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
