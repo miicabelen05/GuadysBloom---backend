@@ -9,5 +9,27 @@
     "stock": 15,
     "category": "cosmetica natural",
     "thumbnails": []
+  },
+  {
+    "id": 2,
+    "title": "Exfoliante Corporal",
+    "description": "Producto agregado desde realtime",
+    "code": "1772755369038",
+    "price": 10900,
+    "status": true,
+    "stock": 10,
+    "category": "general",
+    "thumbnails": []
+  },
+  {
+    "id": 3,
+    "title": "Jabon Natural",
+    "description": "Producto agregado desde realtime",
+    "code": "1772755386550",
+    "price": 6500,
+    "status": true,
+    "stock": 10,
+    "category": "general",
+    "thumbnails": []
   }
 ]

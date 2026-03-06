@@ -1,8 +1,10 @@
 const fs  = require('fs');
+const path = require("path");
 
 class ProductManager {
-    constructor(path) {
-        this.path = path;
+           
+    constructor(filePath) {
+        this.path = path.join(__dirname, "../data/products.json");
     }
 
     async getProducts() {
@@ -16,6 +18,12 @@ class ProductManager {
             console.error('Error al leer los productos:', error);
             return [];
         }
+    }
+
+    async getProductById(pid) {
+        const products = await this.getProducts();
+        const product = products.find(p => p.id == pid);
+        return product || null;
     }
 
     async addProduct(product) {
@@ -32,7 +40,31 @@ class ProductManager {
             return null;
         }
     }
+
+    async updateProduct(pid, updatedFields) {
+
+        const products = await this.getProducts();
+
+        const index = products.findIndex(p => p.id == pid);
+
+        if (index === -1) {
+        return null;
+        }
+
+        products[index] = {
+        ...products[index],
+        ...updatedFields,
+        id: products[index].id
+        };
+
+        await fs.promises.writeFile(this.path, JSON.stringify(products, null, 2));
+
+        return products[index];
+
+    }
 }
 
 module.exports = ProductManager;
+
+
     
