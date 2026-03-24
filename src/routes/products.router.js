@@ -1,21 +1,62 @@
 const express = require('express');
-const ProductManager = require('../managers/ProductManager');
-
 const router = express.Router();
-const productManager = new ProductManager('./src/data/products.json');
 
-router.get('/', async (req, res) => {
+const Product = require("../models/product.model");
 
-  const { limit } = req.query;
+router.get("/", async (req, res) => {
+  try {
 
-  const products = await productManager.getProducts();
+    // Query params
+    const { limit = 10, page = 1, sort, query } = req.query;
 
-  if(limit){
-    return res.json(products.slice(0, limit));
+    // Filtro
+    let filter = {};
+    if (query) {
+      filter.category = query;
+    }
+
+    // Orden
+    let sortOption = {};
+    if (sort === "asc") sortOption.price = 1;
+    if (sort === "desc") sortOption.price = -1;
+
+    // Paginación
+    const products = await Product.find(filter)
+      .sort(sortOption)
+      .limit(Number(limit))
+      .skip((Number(page) - 1) * Number(limit));
+
+    const totalProducts = await Product.countDocuments(filter);
+
+    const totalPages = Math.ceil(totalProducts / limit);
+
+    const baseUrl = "http://localhost:8080/api/products";
+
+  res.json ({
+    status: "success",
+    payload: products,
+    totalPages,
+    page: Number(page),
+    hasPrevPage: Number(page) > 1,
+    hasNextPage: Number(page) < totalPages,
+    prevPage: page > 1 ? Number(page) - 1 : null,
+    nextPage: page < totalPages ? Number(page) + 1 : null,
+
+    prevLink: page > 1 
+      ? `${baseUrl}?page=${Number(page) - 1}&limit=${limit}` 
+      : null,
+
+    nextLink: page < totalPages 
+      ? `${baseUrl}?page=${Number(page) + 1}&limit=${limit}` 
+      : null
+    });
+    
+  } catch (error) {
+    res.status(500).json({
+      status: "error",
+      message: "Error al obtener productos"
+    });
   }
-
-  res.json(products);
-
 });
 
 router.get('/:pid', async (req, res) => {
@@ -35,40 +76,57 @@ router.get('/:pid', async (req, res) => {
 
 });
 
-router.post('/', async(req, res) => {
+router.post("/", async (req, res) => {
+  try {
+
     const {
-        title, 
-        description,
-        code, 
-        price,
-        status,
-        stock,
-        category,
-        thumbnails
+      title, 
+      description,
+      code, 
+      price,
+      status,
+      stock,
+      category,
+      thumbnails
     } = req.body;
 
+    // Validacion
     if (!title || !description || !code || price == null || stock == null || !category) {
-        return res.status(400).json({ 
+      return res.status(400).json({ 
         status: "error",
         message: 'Faltan campos obligatorios'
-        });
+      });
     }
+
+    // Objeto Limpio
     const newProduct = {
-        title,
-        description,
-        code,
-        price,
-        status : status ?? true,
-        stock,
-        category,
-        thumbnails: thumbnails || []
+      title,
+      description,
+      code,
+      price,
+      status: status ?? true,
+      stock,
+      category,
+      thumbnails: thumbnails || []
     };
-    const createdProduct = await productManager.addProduct(newProduct);
-    
+
+    const createdProduct = await Product.create(newProduct);
+
     res.status(201).json({
-    status: "success",
-    payload: createdProduct
+      status: "success",
+      payload: createdProduct
     });
+
+  } catch (error) {
+
+    // Manejo de error
+    res.status(500).json({
+      status: "error",
+      message: "Error al crear producto",
+      error: error.message
+    });
+
+  }
 });
 
 router.put('/:pid', async (req, res) => {

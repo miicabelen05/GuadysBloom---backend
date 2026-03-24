@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const express = require('express');
 const exphbs = require('express-handlebars');
 const http = require('http');
@@ -5,13 +6,17 @@ const { Server } = require('socket.io');
 
 const productsRouter = require('./routes/products.router');
 const cartsRouter = require('./routes/carts.router');
-const ProductManager = require('./managers/ProductManager');
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 const port = 8080;
 
+mongoose.connect("mongodb://localhost:27017/ecommerce")
+  .then(() => console.log("🟢 Conectado a MongoDB"))
+  .catch(err => console.log("🔴 Error MongoDB:", err));
+
+const ProductManager = require('./managers/ProductManager');
 const productManager = new ProductManager('./data/products.json');
 
 app.use(express.json());
